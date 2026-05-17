@@ -17,6 +17,7 @@ export const getDashboardSummary = async (req, res) => {
         budgetRemaining: summary.budgetRemaining,
         monthlyTrend: summary.monthlyTrend,
         categoryBreakdown: summary.categoryBreakdown,
+        categoryBudgets: summary.categoryBudgets,
         recentTransactions: transactions.slice(0, 5)
       }
     });

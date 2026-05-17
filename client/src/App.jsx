@@ -5,6 +5,7 @@ import './App.css'
 // Pages
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import Budget from './pages/Budget'
@@ -22,24 +23,38 @@ import { refreshUser } from './redux/slices/authSlice'
 // ProtectedRoute → reads { isAuthenticated } from state.auth;
 //                  renders <Outlet /> when authenticated, else <Navigate to="/login" replace />
 function ProtectedRoute() {
-  // ...
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 function App() {
-  // redux: dispatch
+  const dispatch = useDispatch();
 
-  // useEffect (on mount) → if token exists in localStorage → dispatch(refreshUser())
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      dispatch(refreshUser());
+    }
+  }, [dispatch]);
 
   return (
     <Router>
       <Routes>
-        {/* Public routes: /login, /signup */}
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-        {/* Protected routes (wrapped in <ProtectedRoute /> and <Layout />):
-            /dashboard, /transactions, /budget, /insights, /reports, /profile
-            "/" → redirect to /dashboard */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/budget" element={<Budget />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+        </Route>
 
-        {/* Catch-all "*" → redirect to /dashboard */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   )

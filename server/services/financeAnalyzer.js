@@ -41,6 +41,7 @@ export const summarizeTransactions = (transactions = [], budget = null) => {
     savings,
     budgetRemaining,
     monthlyBudget,
+    categoryBudgets: budget?.categoryBudgets || [],
     categoryBreakdown,
     monthlyTrend
   };

@@ -10,7 +10,12 @@ import insightReducer from './slices/insightSlice'
 //   budget       → budgetReducer
 //   insights     → insightReducer
 const store = configureStore({
-  reducer: {}
+  reducer: {
+    auth: authReducer,
+    transactions: transactionReducer,
+    budget: budgetReducer,
+    insights: insightReducer
+  }
 })
 
 export default store
