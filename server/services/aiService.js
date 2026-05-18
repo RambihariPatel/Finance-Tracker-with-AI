@@ -19,8 +19,12 @@ export const generateAIInsights = async ({ transactions, budget }) => {
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const prompt = [
-      'Generate concise personal finance insights for this user.',
-      'Return only a JSON array of strings.',
+      'You are a friendly, encouraging financial assistant.',
+      'Generate 3-5 personal finance insights for this user based on their data.',
+      'Use very simple, easy-to-understand language. Avoid complex financial jargon.',
+      'Write like you are talking to a friend. Be actionable and positive.',
+      'Return EXACTLY a JSON array of objects with two keys: "title" (including a relevant emoji) and "description" (1-2 simple sentences).',
+      'Example: [{"title": "🎉 Great Savings!", "description": "You saved some money this month. Keep up the good work!"}]',
       JSON.stringify({
         totalIncome: analysis.totalIncome,
         totalExpense: analysis.totalExpense,

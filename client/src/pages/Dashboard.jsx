@@ -81,6 +81,92 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Monthly Budget Progress Bar */}
+      {summary.monthlyBudget > 0 && (() => {
+        const spent = summary.totalExpense || 0
+        const budget = summary.monthlyBudget || 0
+        const percentage = Math.min(100, Math.round((spent / budget) * 100))
+        const remaining = Math.max(0, budget - spent)
+
+        let barGradient = 'linear-gradient(90deg, #4ade80, #22c55e)'
+        let statusColor = 'text-green-600'
+        let statusBg = 'bg-green-50'
+        let statusBorder = 'border-green-200'
+        let statusEmoji = '✅'
+        let statusText = 'On Track'
+        let glowColor = 'shadow-green-100'
+
+        if (percentage >= 100) {
+          barGradient = 'linear-gradient(90deg, #f87171, #dc2626)'
+          statusColor = 'text-red-600'
+          statusBg = 'bg-red-50'
+          statusBorder = 'border-red-200'
+          statusEmoji = '🔴'
+          statusText = 'Budget Exceeded!'
+          glowColor = 'shadow-red-100'
+        } else if (percentage >= 80) {
+          barGradient = 'linear-gradient(90deg, #fbbf24, #f59e0b)'
+          statusColor = 'text-amber-600'
+          statusBg = 'bg-amber-50'
+          statusBorder = 'border-amber-200'
+          statusEmoji = '⚠️'
+          statusText = 'Warning - Almost Full'
+          glowColor = 'shadow-amber-100'
+        } else if (percentage >= 50) {
+          barGradient = 'linear-gradient(90deg, #60a5fa, #3b82f6)'
+          statusColor = 'text-blue-600'
+          statusBg = 'bg-blue-50'
+          statusBorder = 'border-blue-200'
+          statusEmoji = '📊'
+          statusText = 'Moderate'
+          glowColor = 'shadow-blue-100'
+        }
+
+        return (
+          <section className={`rounded-2xl border ${statusBorder} bg-white p-6 shadow-lg ${glowColor}`}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800">Monthly Budget Overview</h2>
+                <p className="text-sm text-gray-500 mt-0.5">How much of your budget is used this month</p>
+              </div>
+              <span className={`inline-flex items-center gap-1.5 text-sm font-bold px-4 py-1.5 rounded-full border ${statusBg} ${statusColor} ${statusBorder}`}>
+                {statusEmoji} {statusText}
+              </span>
+            </div>
+
+            {/* Bar */}
+            <div className="relative h-6 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+              <div
+                className="h-full rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${percentage}%`, background: barGradient }}
+              />
+              {/* Percentage Label inside bar */}
+              {percentage > 10 && (
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                  {percentage}% used
+                </span>
+              )}
+            </div>
+
+            {/* Stats below bar */}
+            <div className="flex flex-col sm:flex-row justify-between mt-4 gap-3">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-red-400 inline-block"></span>
+                <span className="text-sm text-gray-600">Spent: <span className="font-bold text-gray-800">{formatCurrency(spent)}</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-green-400 inline-block"></span>
+                <span className="text-sm text-gray-600">Remaining: <span className="font-bold text-gray-800">{formatCurrency(remaining)}</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-indigo-400 inline-block"></span>
+                <span className="text-sm text-gray-600">Total Budget: <span className="font-bold text-gray-800">{formatCurrency(budget)}</span></span>
+              </div>
+            </div>
+          </section>
+        )
+      })()}
+
       <div className="grid gap-6 xl:grid-cols-3">
         <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm xl:col-span-2">
           <h2 className="text-lg font-bold text-gray-800 border-b pb-4 mb-4">Monthly Spending Trend</h2>

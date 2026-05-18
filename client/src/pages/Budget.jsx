@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchBudget, saveBudget } from '../redux/slices/budgetSlice'
+import toast from 'react-hot-toast'
 
 function Budget() {
   const dispatch = useDispatch()
@@ -8,7 +9,6 @@ function Budget() {
   
   const [localBudget, setLocalBudget] = useState(0)
   const [localCategories, setLocalCategories] = useState([])
-  const [message, setMessage] = useState('')
 
   useEffect(() => {
     dispatch(fetchBudget())
@@ -36,20 +36,18 @@ function Budget() {
 
   const handleSave = async (e) => {
     e.preventDefault()
-    setMessage('')
     try {
       const action = await dispatch(saveBudget({
         monthlyBudget: localBudget,
         categoryBudgets: localCategories
       }))
       if (saveBudget.fulfilled.match(action)) {
-        setMessage('Budget saved successfully!')
-        setTimeout(() => setMessage(''), 3000)
+        toast.success('💰 Budget saved successfully!')
       } else {
-        setMessage('Failed to save budget.')
+        toast.error('❌ Failed to save budget. Please try again.')
       }
     } catch {
-      setMessage('An error occurred.')
+      toast.error('❌ An error occurred.')
     }
   }
 
@@ -60,8 +58,7 @@ function Budget() {
         <p className="text-gray-500">Set limits and track your spending</p>
       </div>
 
-      {message && <div className="bg-green-50 text-green-700 p-4 rounded-lg">{message}</div>}
-      {error && <div className="bg-red-50 text-red-500 p-4 rounded-lg">{error}</div>}
+      {error && toast.error(error)}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSave} className="space-y-6">

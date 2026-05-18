@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchTransactions, removeTransactionById, saveTransaction } from '../redux/slices/transactionSlice'
 import { formatCurrency, formatDate } from '../utils/format'
+import toast from 'react-hot-toast'
 
 const emptyForm = {
   type: 'expense',
@@ -20,7 +21,6 @@ function Transactions() {
   const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState(emptyForm)
   const [editingId, setEditingId] = useState(null)
-  const [localMessage, setLocalMessage] = useState('')
 
   useEffect(() => {
     dispatch(fetchTransactions({}))
@@ -30,7 +30,6 @@ function Transactions() {
     setEditingId(null)
     setFormData(emptyForm)
     setShowForm(true)
-    setLocalMessage('')
   }
 
   const openEdit = (item) => {
@@ -45,22 +44,21 @@ function Transactions() {
       transactionDate: new Date(item.transactionDate).toISOString().slice(0, 10)
     })
     setShowForm(true)
-    setLocalMessage('')
   }
 
   const submitForm = async (e) => {
     e.preventDefault()
-    setLocalMessage('')
     try {
       const action = await dispatch(saveTransaction({ id: editingId, data: formData }))
       if (saveTransaction.fulfilled.match(action)) {
         setShowForm(false)
         dispatch(fetchTransactions({}))
+        toast.success(editingId ? '✏️ Transaction updated successfully!' : '✅ Transaction added successfully!')
       } else {
-        setLocalMessage('Failed to save transaction')
+        toast.error('❌ Failed to save transaction. Please try again.')
       }
     } catch {
-      setLocalMessage('An error occurred')
+      toast.error('❌ An unexpected error occurred.')
     }
   }
 
@@ -68,6 +66,7 @@ function Transactions() {
     if (window.confirm('Are you sure you want to delete this transaction?')) {
       await dispatch(removeTransactionById(id))
       dispatch(fetchTransactions({}))
+      toast.success('🗑️ Transaction deleted successfully!')
     }
   }
 
@@ -86,11 +85,7 @@ function Transactions() {
         </button>
       </div>
 
-      {(error || localMessage) && (
-        <div className="bg-red-50 text-red-500 p-4 rounded-lg">
-          {error || localMessage}
-        </div>
-      )}
+      {error && toast.error(error)}
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">

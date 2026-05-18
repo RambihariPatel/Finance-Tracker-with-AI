@@ -57,10 +57,12 @@ export const analyzeFinance = ({ transactions = [], budget = null }) => {
     return {
       ...summary,
       insights: [
-        'Add your first income and expense entries to unlock personalized finance insights.',
-        'Set a monthly budget so FinTrack can flag overspending before it becomes a problem.'
+        { title: "👋 Welcome to FinTrack!", description: "Add your first income and expense entries to unlock personalized insights." },
+        { title: "🎯 Set a Goal", description: "Set a monthly budget so we can help you stay on track and avoid overspending." }
       ],
-      recommendations: ['Start with recurring expenses like rent, subscriptions, groceries, and transport.'],
+      recommendations: [
+        { title: "💡 Pro Tip", description: "Start by adding your fixed expenses like rent, subscriptions, and groceries." }
+      ],
       predictedExpense: 0,
       confidence: 0
     };
@@ -69,36 +71,39 @@ export const analyzeFinance = ({ transactions = [], budget = null }) => {
   const topCategory = summary.categoryBreakdown[0];
   if (topCategory) {
     const share = summary.totalExpense ? Math.round((topCategory.amount / summary.totalExpense) * 100) : 0;
-    insights.push(`${topCategory.category} is your biggest spending category at${currency(topCategory.amount)} (${share}% of expenses).`);
+    insights.push({
+      title: "📊 Top Spending Area",
+      description: `You spent the most on ${topCategory.category} (${currency(topCategory.amount)}). That's about ${share}% of your total expenses.`
+    });
   }
 
   if (summary.monthlyBudget > 0) {
     const used = Math.round((summary.totalExpense / summary.monthlyBudget) * 100);
     if (used >= 100) {
-      insights.push(`You have exceeded your monthly budget by${currency(Math.abs(summary.budgetRemaining))}.`);
+      insights.push({ title: "⚠️ Budget Alert", description: `Oops! You have crossed your monthly budget by ${currency(Math.abs(summary.budgetRemaining))}. Try to cut back on non-essentials.` });
     } else if (used >= 80) {
-      insights.push(`You have used${used}% of your monthly budget. Slow down discretionary spending this month.`);
+      insights.push({ title: "👀 Watch Your Spending", description: `You have used ${used}% of your budget for this month. It's time to slow down a bit!` });
     } else {
-      insights.push(`You still have${currency(summary.budgetRemaining)} available from this month's budget.`);
+      insights.push({ title: "✅ On Track", description: `Great job! You still have ${currency(summary.budgetRemaining)} left in your budget this month.` });
     }
   }
 
   budget?.categoryBudgets?.forEach((item) => {
     const spent = summary.categoryBreakdown.find((entry) => entry.category === item.category)?.amount || 0;
     if (item.limit > 0 && spent > item.limit) {
-      insights.push(`${item.category} spending exceeded its category budget by${currency(spent - item.limit)}.`);
+      insights.push({ title: "🚨 Category Over Limit", description: `You went over your budget for ${item.category} by ${currency(spent - item.limit)}.` });
     }
   });
 
   if (summary.savings < 0) {
-    insights.push(`Your expenses are higher than income by${currency(Math.abs(summary.savings))}.`);
-    recommendations.push('Prioritize reducing flexible categories until monthly cash flow is positive again.');
+    insights.push({ title: "📉 Spending More Than Earning", description: `Your expenses are higher than your income by ${currency(Math.abs(summary.savings))}.` });
+    recommendations.push({ title: "💡 Quick Fix", description: "Try to reduce flexible spending (like dining out) until your cash flow is positive again." });
   } else {
-    recommendations.push(`You are currently saving${currency(summary.savings)}. Consider moving part of it to a dedicated savings goal.`);
+    recommendations.push({ title: "💰 Saving Up", description: `You are currently saving ${currency(summary.savings)}. Consider moving some of this into a dedicated savings account!` });
   }
 
   if (topCategory) {
-    recommendations.push(`A 10% reduction in${topCategory.category} could save about${currency(topCategory.amount * 0.1)} this period.`);
+    recommendations.push({ title: "✂️ Easy Savings", description: `If you cut back just 10% on ${topCategory.category}, you could save around ${currency(topCategory.amount * 0.1)}!` });
   }
 
   const monthlyExpenses = summary.monthlyTrend.map((item) => item.expense);

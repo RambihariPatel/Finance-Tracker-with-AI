@@ -1,4 +1,55 @@
 import Transaction from '../models/Transaction.js';
+import Budget from '../models/Budget.js';
+import User from '../models/User.js';
+import sendEmail from '../utils/sendEmail.js';
+import mongoose from 'mongoose';
+
+const checkBudgetAndNotify = async (userId) => {
+  try {
+    const budget = await Budget.findOne({ userId });
+    if (!budget) return;
+
+    const user = await User.findById(userId);
+    if (!user) return;
+
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const endOfMonth = new Date(startOfMonth);
+    endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+
+    const expenses = await Transaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: 'expense',
+          transactionDate: { $gte: startOfMonth, $lt: endOfMonth }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    const totalExpenses = expenses.length > 0 ? expenses[0].totalAmount : 0;
+
+    if (totalExpenses > budget.monthlyBudget) {
+      const message = `Alert: Your total expenses for this month (₹${totalExpenses}) have exceeded your monthly budget (₹${budget.monthlyBudget}).`;
+      await sendEmail({
+        email: user.email,
+        subject: 'Finance Tracker: Budget Exceeded Alert',
+        message: message,
+        htmlMessage: `<h3>Budget Alert</h3><p>${message}</p><p>Please review your expenses on your Finance Tracker Dashboard to stay on track!</p>`
+      });
+    }
+  } catch (error) {
+    console.error('Error in checkBudgetAndNotify:', error);
+  }
+};
 
 export const createTransaction = async (req, res) => {
   try {
@@ -21,6 +72,11 @@ export const createTransaction = async (req, res) => {
       description: description?.trim(),
       transactionDate: transactionDate || new Date()
     });
+
+    // Check budget if it's an expense
+    if (type === 'expense') {
+      await checkBudgetAndNotify(req.userId);
+    }
 
     res.status(201).json({
       success: true,
@@ -116,6 +172,11 @@ export const updateTransaction = async (req, res) => {
         success: false,
         message: 'Transaction not found'
       });
+    }
+
+    // Check budget if the transaction type is/was expense
+    if (transaction.type === 'expense') {
+      await checkBudgetAndNotify(req.userId);
     }
 
     res.status(200).json({

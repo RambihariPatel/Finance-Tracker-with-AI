@@ -17,6 +17,27 @@ function Insights() {
     dispatch(fetchPrediction())
   }
 
+  const downloadInsights = () => {
+    const text = `FinTrackAI - Financial Insights\n` +
+      `Date: ${new Date().toLocaleDateString()}\n` +
+      `=======================================\n\n` +
+      `--- Recommendations ---\n` +
+      insights.map(i => `${i.title || 'Insight'}\n${i.description || i}`).join('\n\n') + 
+      `\n\n--- Spending Prediction ---\n` +
+      `Estimated Expense Next Month: ${formatCurrency(predictions.predictedExpense || 0)}\n` +
+      `Model Confidence: ${predictions.confidence || 0}%\n`;
+      
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fintrack-insights-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto py-6 px-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -24,13 +45,23 @@ function Insights() {
           <h1 className="text-3xl font-bold text-gray-800">AI Financial Insights</h1>
           <p className="text-gray-500">Smart analysis of your spending habits</p>
         </div>
-        <button 
-          onClick={refreshInsights}
-          disabled={loading}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition disabled:opacity-50"
-        >
-          {loading ? 'Analyzing...' : 'Refresh Insights'}
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={downloadInsights}
+            disabled={loading || insights.length === 0}
+            className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition disabled:opacity-50 flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Download
+          </button>
+          <button 
+            onClick={refreshInsights}
+            disabled={loading}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg font-medium transition disabled:opacity-50"
+          >
+            {loading ? 'Analyzing...' : 'Refresh Insights'}
+          </button>
+        </div>
       </div>
 
       {error && (
