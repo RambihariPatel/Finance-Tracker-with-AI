@@ -14,3 +14,121 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* ============================================
+   GLOBAL DARK MODE OVERRIDES
+   These apply automatically when .dark is on <html>
+   ============================================ */
+
+/* Page background */
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* All white cards → dark slate */
+.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+/* Light gray backgrounds → darker */
+.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-\[\#f8fafc\] {
+  background-color: #0f172a !important;
+}
+
+/* Borders */
+.dark .border-gray-100 {
+  border-color: #334155 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #334155 !important;
+}
+
+/* Text colors */
+.dark .text-gray-900,
+.dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-gray-500 {
+  color: #64748b !important;
+}
+
+/* Table hover rows */
+.dark .hover\:bg-gray-50:hover {
+  background-color: #1e293b !important;
+}
+
+/* Inputs & Selects */
+.dark input:not([type="range"]),
+.dark select,
+.dark textarea {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b;
+}
+
+/* Table headers */
+.dark thead,
+.dark .bg-gray-50 {
+  background-color: #1a2744 !important;
+}
+
+/* Dividers */
+.dark .divide-gray-100 > * + * {
+  border-color: #334155;
+}
+
+.dark .border-b {
+  border-color: #334155 !important;
+}
+
+.dark .border-t {
+  border-color: #334155 !important;
+}
+
+/* Summary stat cards with colored backgrounds — keep them but slightly darker */
+.dark .bg-green-50  { background-color: #052e16 !important; }
+.dark .bg-red-50    { background-color: #2d0a0a !important; }
+.dark .bg-indigo-50 { background-color: #1e1b4b !important; }
+.dark .bg-amber-50  { background-color: #2d1b00 !important; }
+.dark .bg-blue-50   { background-color: #0c1a2e !important; }
+
+/* Shadows soften in dark mode */
+.dark .shadow-sm {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+}
+
+/* Modal backdrop in dark */
+.dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* White modal/form backgrounds */
+.dark .bg-white.rounded-xl,
+.dark .bg-white.rounded-2xl {
+  background-color: #1e293b !important;
+}
+
+/* Transition for smooth switch */
+*, *::before, *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
+}

@@ -45,7 +45,7 @@ function Insights() {
           <h1 className="text-3xl font-bold text-gray-800">AI Financial Insights</h1>
           <p className="text-gray-500">Smart analysis of your spending habits</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button 
             onClick={downloadInsights}
             disabled={loading || insights.length === 0}

@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 import BudgetAlertBanner from '../common/BudgetAlertBanner'
@@ -60,15 +61,27 @@ function Footer() {
 }
 
 function Layout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   return (
     <div className="flex h-screen bg-[#f8fafc] dark:bg-slate-950 font-sans transition-colors duration-300">
+      {/* Sidebar Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <Sidebar />
+      <div className={`fixed inset-y-0 left-0 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 md:z-0`}>
+        <Sidebar onClose={() => setSidebarOpen(false)} />
+      </div>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Navbar */}
-        <Navbar />
+        <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Budget Alert Banner — shows automatically when budget >= 80% used */}
         <BudgetAlertBanner />

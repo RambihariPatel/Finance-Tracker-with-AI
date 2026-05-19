@@ -155,7 +155,7 @@ function Landing() {
                 <div className="flex-1 bg-white/5 rounded-md h-6 ml-4"></div>
               </div>
               {/* Fake dashboard preview */}
-              <div className="grid grid-cols-4 gap-3 mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 {[
                   { label: 'Total Income', val: '₹50,000', color: 'text-green-400' },
                   { label: 'Total Expense', val: '₹18,500', color: 'text-red-400' },
@@ -168,8 +168,8 @@ function Landing() {
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2 bg-white/5 rounded-lg p-3 h-32 flex flex-col">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="md:col-span-2 bg-white/5 rounded-lg p-3 h-32 flex flex-col">
                   <p className="text-gray-500 text-xs mb-2">Monthly Trend</p>
                   <div className="flex-1 flex items-end gap-2 px-2">
                     {[40, 65, 45, 80, 55, 90].map((h, i) => (

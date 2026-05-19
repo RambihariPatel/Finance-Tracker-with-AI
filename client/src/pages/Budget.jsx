@@ -90,8 +90,8 @@ function Budget() {
 
             <div className="space-y-4">
               {localCategories.map((cat, i) => (
-                <div key={i} className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg">
-                  <div className="flex-1">
+                <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="flex-1 w-full sm:w-auto">
                     <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Category Name</label>
                     <select 
                       value={cat.category}
@@ -106,7 +106,7 @@ function Budget() {
                       <option value="Other">Other</option>
                     </select>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 w-full sm:w-auto">
                     <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Limit</label>
                     <div className="relative">
                       <span className="absolute left-3 top-2 text-gray-400">₹</span>
@@ -118,7 +118,7 @@ function Budget() {
                       />
                     </div>
                   </div>
-                  <div className="pt-5">
+                  <div className="pt-2 sm:pt-5 w-full sm:w-auto text-right sm:text-left">
                     <button 
                       type="button" 
                       onClick={() => removeCategory(i)}

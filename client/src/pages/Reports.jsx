@@ -140,7 +140,7 @@ function Reports() {
           <p className="text-gray-500 dark:text-slate-400">Detailed financial breakdown by period</p>
         </div>
         {/* Export Buttons */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={exportExcel}
             disabled={!report || loading}
@@ -201,7 +201,7 @@ function Reports() {
 
       {report && !loading && (
         <>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
             {[
               { label: 'Income', value: report.totalIncome, color: 'text-green-600', bg: 'bg-green-50', icon: '💰' },
               { label: 'Expense', value: report.totalExpense, color: 'text-red-500', bg: 'bg-red-50', icon: '💸' },
@@ -283,7 +283,7 @@ function Reports() {
           {categoryData.length > 0 && (
             <section className="rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-800 dark:text-slate-100 border-b dark:border-slate-700 pb-4 mb-5">Category Breakdown</h2>
-              <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {categoryData.map((c, i) => (
                   <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600">
                     <div className="text-2xl w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-600 rounded-full shadow-sm">

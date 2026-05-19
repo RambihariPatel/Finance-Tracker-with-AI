@@ -63,21 +63,21 @@ function Dashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Income</p>
           <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(summary.totalIncome)}</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Expense</p>
           <p className="text-3xl font-bold text-red-600 mt-2">{formatCurrency(summary.totalExpense)}</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Remaining Budget</p>
           <p className="text-3xl font-bold text-indigo-600 mt-2">{formatCurrency(summary.budgetRemaining)}</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between bg-gradient-to-br from-indigo-50 to-blue-50">
-          <p className="text-sm font-semibold text-indigo-800 uppercase tracking-wider">Net Savings</p>
-          <p className="text-3xl font-bold text-indigo-900 mt-2">{formatCurrency(summary.savings)}</p>
+        <div className="bg-indigo-50 dark:bg-indigo-950 rounded-2xl shadow-sm border border-indigo-100 dark:border-indigo-900 p-6 flex flex-col justify-between">
+          <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300 uppercase tracking-wider">Net Savings</p>
+          <p className="text-3xl font-bold text-indigo-900 dark:text-indigo-200 mt-2">{formatCurrency(summary.savings)}</p>
         </div>
       </div>
 

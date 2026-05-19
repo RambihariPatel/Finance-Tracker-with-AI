@@ -1,16 +1,26 @@
 import { useSelector } from 'react-redux'
 import { useDarkMode } from '../../hooks/useDarkMode'
 
-function Navbar() {
+function Navbar({ onMenuClick }) {
   const { user } = useSelector((state) => state.auth)
   const { isDark, toggle } = useDarkMode()
 
   return (
     <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-slate-700 z-10 sticky top-0 transition-colors duration-300">
-      <div className="px-8 py-4 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100 hidden sm:block">
-          Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
-        </h2>
+      <div className="px-4 md:px-8 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={onMenuClick}
+            className="md:hidden text-gray-600 dark:text-slate-300 hover:text-indigo-600 focus:outline-none p-1 rounded-md"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100 hidden sm:block">
+            Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
+          </h2>
+        </div>
         <div className="flex items-center gap-4 ml-auto">
 
           {/* Dark Mode Toggle */}

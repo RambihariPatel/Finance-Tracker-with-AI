@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { logout } from '../../redux/slices/authSlice'
 
-function Sidebar() {
+function Sidebar({ onClose }) {
   const location = useLocation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -25,13 +25,18 @@ function Sidebar() {
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 h-screen flex flex-col shadow-xl z-20">
-      <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-        <div className="w-12 h-12 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0 shadow-[0_0_15px_rgba(79,70,229,0.3)] border border-indigo-500/30">
-          <img src="/logo.png" alt="FinTrackAI Logo" className="w-full h-full object-cover scale-110" />
+      <div className="p-6 border-b border-slate-800 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 overflow-hidden rounded-xl bg-slate-800 flex-shrink-0 shadow-[0_0_15px_rgba(79,70,229,0.3)] border border-indigo-500/30">
+            <img src="/logo.png" alt="FinTrackAI Logo" className="w-full h-full object-cover scale-110" />
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-white tracking-wide">FinTrack<span className="text-indigo-400">AI</span></h1>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-black text-white tracking-wide">FinTrack<span className="text-indigo-400">AI</span></h1>
-        </div>
+        <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white p-1">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -39,6 +44,7 @@ function Sidebar() {
           <Link
             key={item.path}
             to={item.path}
+            onClick={onClose}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition duration-200 group ${
               isActive(item.path) 
                 ? 'bg-indigo-600 text-white font-semibold shadow-md' 
