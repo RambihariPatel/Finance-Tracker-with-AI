@@ -7,4 +7,3 @@ An AI-powered personal finance tracking application built using the MERN stack (
 - AI-driven financial insights
 - Secure Authentication
 - Responsive UI
-..........................
