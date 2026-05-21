@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchTransactions, removeTransactionById, saveTransaction } from '../redux/slices/transactionSlice'
-import { formatCurrency, formatDate } from '../utils/format'
+import { formatCurrency, formatDate, SUPPORTED_CURRENCIES } from '../utils/format'
 import toast from 'react-hot-toast'
 
 const emptyForm = {
@@ -10,16 +10,18 @@ const emptyForm = {
   amount: '',
   category: 'Food',
   paymentMethod: 'upi',
+  currency: 'INR',
   description: '',
   transactionDate: new Date().toISOString().slice(0, 10)
 }
 
 function Transactions() {
   const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
   const { transactions, loading, error } = useSelector((state) => state.transactions)
   
   const [showForm, setShowForm] = useState(false)
-  const [formData, setFormData] = useState(emptyForm)
+  const [formData, setFormData] = useState({ ...emptyForm, currency: user?.baseCurrency || 'INR' })
   const [editingId, setEditingId] = useState(null)
 
   useEffect(() => {
@@ -28,7 +30,7 @@ function Transactions() {
 
   const openCreate = () => {
     setEditingId(null)
-    setFormData(emptyForm)
+    setFormData({ ...emptyForm, currency: user?.baseCurrency || 'INR' })
     setShowForm(true)
   }
 
@@ -38,6 +40,7 @@ function Transactions() {
       type: item.type,
       title: item.title,
       amount: item.amount,
+      currency: item.currency || user?.baseCurrency || 'INR',
       category: item.category,
       paymentMethod: item.paymentMethod,
       description: item.description || '',
@@ -114,7 +117,12 @@ function Transactions() {
                     </td>
                     <td className="px-6 py-4 text-gray-600">{t.category}</td>
                     <td className="px-6 py-4 text-gray-500">{formatDate(t.transactionDate)}</td>
-                    <td className="px-6 py-4 font-semibold text-gray-800">{formatCurrency(t.amount)}</td>
+                    <td className="px-6 py-4 font-semibold text-gray-800">
+                      {formatCurrency(t.amount, t.currency || 'INR')}
+                      {t.currency && t.currency !== user?.baseCurrency && (
+                        <div className="text-xs text-gray-400">({formatCurrency(t.baseAmount || t.amount, user?.baseCurrency)})</div>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <button onClick={() => openEdit(t)} className="text-indigo-600 hover:text-indigo-900 mr-4 font-medium">Edit</button>
                       <button onClick={() => deleteItem(t._id)} className="text-red-500 hover:text-red-700 font-medium">Delete</button>
@@ -168,10 +176,18 @@ function Transactions() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Amount</label>
-                  <input type="number" required placeholder="0.00" min="0" step="0.01"
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  />
+                  <div className="flex">
+                    <select
+                      className="border rounded-l-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 border-r-0"
+                      value={formData.currency} onChange={(e) => setFormData({...formData, currency: e.target.value})}
+                    >
+                      {SUPPORTED_CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <input type="number" required placeholder="0.00" min="0" step="0.01"
+                      className="w-full border rounded-r-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+                      value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>

@@ -20,6 +20,15 @@ const transactionSchema = new mongoose.Schema({
     required: [true, 'Please provide an amount'],
     min: [0, 'Amount cannot be negative']
   },
+  currency: {
+    type: String,
+    default: 'INR',
+    enum: ['INR', 'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'JPY']
+  },
+  baseAmount: {
+    type: Number,
+    default: function() { return this.amount; }
+  },
   category: {
     type: String,
     required: [true, 'Please select a category']

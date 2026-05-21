@@ -15,10 +15,12 @@ import {
 } from 'recharts'
 import { getDashboardSummary } from '../services/dashboardService'
 import { formatCurrency, formatDate } from '../utils/format'
+import { useSelector } from 'react-redux'
 
 const COLORS = ['#2563eb', '#059669', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2']
 
 function Dashboard() {
+  const { user } = useSelector((state) => state.auth)
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -65,19 +67,19 @@ function Dashboard() {
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Income</p>
-          <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(summary.totalIncome)}</p>
+          <p className="text-3xl font-bold text-green-600 mt-2">{formatCurrency(summary.totalIncome, user?.baseCurrency)}</p>
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Expense</p>
-          <p className="text-3xl font-bold text-red-600 mt-2">{formatCurrency(summary.totalExpense)}</p>
+          <p className="text-3xl font-bold text-red-600 mt-2">{formatCurrency(summary.totalExpense, user?.baseCurrency)}</p>
         </div>
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Remaining Budget</p>
-          <p className="text-3xl font-bold text-indigo-600 mt-2">{formatCurrency(summary.budgetRemaining)}</p>
+          <p className="text-3xl font-bold text-indigo-600 mt-2">{formatCurrency(summary.budgetRemaining, user?.baseCurrency)}</p>
         </div>
         <div className="bg-indigo-50 dark:bg-indigo-950 rounded-2xl shadow-sm border border-indigo-100 dark:border-indigo-900 p-6 flex flex-col justify-between">
           <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300 uppercase tracking-wider">Net Savings</p>
-          <p className="text-3xl font-bold text-indigo-900 dark:text-indigo-200 mt-2">{formatCurrency(summary.savings)}</p>
+          <p className="text-3xl font-bold text-indigo-900 dark:text-indigo-200 mt-2">{formatCurrency(summary.savings, user?.baseCurrency)}</p>
         </div>
       </div>
 
@@ -152,15 +154,15 @@ function Dashboard() {
             <div className="flex flex-col sm:flex-row justify-between mt-4 gap-3">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-red-400 inline-block"></span>
-                <span className="text-sm text-gray-600">Spent: <span className="font-bold text-gray-800">{formatCurrency(spent)}</span></span>
+                <span className="text-sm text-gray-600">Spent: <span className="font-bold text-gray-800">{formatCurrency(spent, user?.baseCurrency)}</span></span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-green-400 inline-block"></span>
-                <span className="text-sm text-gray-600">Remaining: <span className="font-bold text-gray-800">{formatCurrency(remaining)}</span></span>
+                <span className="text-sm text-gray-600">Remaining: <span className="font-bold text-gray-800">{formatCurrency(remaining, user?.baseCurrency)}</span></span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-indigo-400 inline-block"></span>
-                <span className="text-sm text-gray-600">Total Budget: <span className="font-bold text-gray-800">{formatCurrency(budget)}</span></span>
+                <span className="text-sm text-gray-600">Total Budget: <span className="font-bold text-gray-800">{formatCurrency(budget, user?.baseCurrency)}</span></span>
               </div>
             </div>
           </section>
@@ -254,7 +256,7 @@ function Dashboard() {
                     </div>
                   </div>
                   <div className={`font-bold ${t.type === 'income' ? 'text-green-600' : 'text-gray-800'}`}>
-                    {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                    {t.type === 'income' ? '+' : '-'}{formatCurrency(t.baseAmount || t.amount, user?.baseCurrency)}
                   </div>
                 </div>
               ))
@@ -302,7 +304,7 @@ function Dashboard() {
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h3 className="font-bold text-gray-800 text-base">{cat.category}</h3>
-                      <p className="text-xs text-gray-400 mt-0.5">Budget Target: {formatCurrency(cat.limit)}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Budget Target: {formatCurrency(cat.limit, user?.baseCurrency)}</p>
                     </div>
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${bgTagColor} ${textColor}`}>
                       {statusText}
@@ -311,7 +313,7 @@ function Dashboard() {
                   
                   <div className="space-y-2 mt-2">
                     <div className="flex justify-between text-xs font-semibold text-gray-500">
-                      <span>Spent: {formatCurrency(spent)}</span>
+                      <span>Spent: {formatCurrency(spent, user?.baseCurrency)}</span>
                       <span>{percentage}%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">

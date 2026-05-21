@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false
   },
+  baseCurrency: {
+    type: String,
+    default: 'INR',
+    enum: ['INR', 'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'JPY']
+  },
   createdAt: {
     type: Date,
     default: Date.now

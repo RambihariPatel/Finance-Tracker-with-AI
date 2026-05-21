@@ -3,6 +3,7 @@ import Budget from '../models/Budget.js';
 import User from '../models/User.js';
 import sendEmail from '../utils/sendEmail.js';
 import mongoose from 'mongoose';
+import { convertAmount } from '../services/currencyService.js';
 
 const checkBudgetAndNotify = async (userId) => {
   try {
@@ -53,7 +54,7 @@ const checkBudgetAndNotify = async (userId) => {
 
 export const createTransaction = async (req, res) => {
   try {
-    const { type, title, amount, category, paymentMethod, description, transactionDate } = req.body;
+    const { type, title, amount, currency, category, paymentMethod, description, transactionDate } = req.body;
 
     if (!type || !title?.trim() || amount === undefined || Number(amount) <= 0 || !category?.trim()) {
       return res.status(400).json({
@@ -62,11 +63,18 @@ export const createTransaction = async (req, res) => {
       });
     }
 
+    const user = await User.findById(req.userId);
+    const baseCurrency = user?.baseCurrency || 'INR';
+    const txCurrency = currency || 'INR';
+    const baseAmount = await convertAmount(Number(amount), txCurrency, baseCurrency);
+
     const transaction = await Transaction.create({
       userId: req.userId,
       type,
       title: title.trim(),
       amount: Number(amount),
+      currency: txCurrency,
+      baseAmount,
       category: category.trim(),
       paymentMethod,
       description: description?.trim(),
@@ -142,7 +150,7 @@ export const getTransactions = async (req, res) => {
 export const updateTransaction = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type, title, amount, category, paymentMethod, description, transactionDate } = req.body;
+    const { type, title, amount, currency, category, paymentMethod, description, transactionDate } = req.body;
 
     if (type && !['income', 'expense'].includes(type)) {
       return res.status(400).json({
@@ -150,11 +158,24 @@ export const updateTransaction = async (req, res) => {
         message: 'Transaction type must be income or expense'
       });
     }
+    
+    const existingTx = await Transaction.findOne({ _id: id, userId: req.userId });
+    if (!existingTx) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    const updatedAmount = amount !== undefined ? Number(amount) : existingTx.amount;
+    const updatedCurrency = currency !== undefined ? currency : existingTx.currency;
+    const user = await User.findById(req.userId);
+    const baseCurrency = user?.baseCurrency || 'INR';
+    const baseAmount = await convertAmount(updatedAmount, updatedCurrency, baseCurrency);
 
     const update = {
       ...(type && { type }),
       ...(title !== undefined && { title: title.trim() }),
       ...(amount !== undefined && { amount: Number(amount) }),
+      ...(currency !== undefined && { currency }),
+      baseAmount,
       ...(category !== undefined && { category: category.trim() }),
       ...(paymentMethod !== undefined && { paymentMethod }),
       ...(description !== undefined && { description: description?.trim() }),

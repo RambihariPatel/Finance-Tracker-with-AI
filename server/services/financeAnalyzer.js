@@ -1,4 +1,10 @@
-const currency = (value) => `₹${Math.round(value || 0).toLocaleString('en-IN')}`;
+const formatCurrency = (value, currencyCode = 'INR') => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: currencyCode,
+    maximumFractionDigits: 0
+  }).format(value || 0);
+};
 
 export const getMonthRange = (date = new Date()) => {
   const start = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -9,14 +15,14 @@ export const getMonthRange = (date = new Date()) => {
 export const summarizeTransactions = (transactions = [], budget = null) => {
   const income = transactions.filter((item) => item.type === 'income');
   const expenses = transactions.filter((item) => item.type === 'expense');
-  const totalIncome = income.reduce((sum, item) => sum + item.amount, 0);
-  const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
+  const totalIncome = income.reduce((sum, item) => sum + (item.baseAmount || item.amount), 0);
+  const totalExpense = expenses.reduce((sum, item) => sum + (item.baseAmount || item.amount), 0);
   const savings = totalIncome - totalExpense;
   const monthlyBudget = budget?.monthlyBudget || 0;
   const budgetRemaining = monthlyBudget ? monthlyBudget - totalExpense : savings;
 
   const categoryTotals = expenses.reduce((acc, item) => {
-    acc[item.category] = (acc[item.category] || 0) + item.amount;
+    acc[item.category] = (acc[item.category] || 0) + (item.baseAmount || item.amount);
     return acc;
   }, {});
 
@@ -29,7 +35,7 @@ export const summarizeTransactions = (transactions = [], budget = null) => {
     const date = new Date(item.transactionDate);
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     const current = monthlyBuckets.get(key) || { month: key, income: 0, expense: 0 };
-    current[item.type] += item.amount;
+    current[item.type] += (item.baseAmount || item.amount);
     monthlyBuckets.set(key, current);
   });
 
@@ -47,7 +53,7 @@ export const summarizeTransactions = (transactions = [], budget = null) => {
   };
 };
 
-export const analyzeFinance = ({ transactions = [], budget = null }) => {
+export const analyzeFinance = ({ transactions = [], budget = null, baseCurrency = 'INR' }) => {
   const summary = summarizeTransactions(transactions, budget);
   const expenses = transactions.filter((item) => item.type === 'expense');
   const insights = [];
@@ -73,37 +79,37 @@ export const analyzeFinance = ({ transactions = [], budget = null }) => {
     const share = summary.totalExpense ? Math.round((topCategory.amount / summary.totalExpense) * 100) : 0;
     insights.push({
       title: "📊 Top Spending Area",
-      description: `You spent the most on ${topCategory.category} (${currency(topCategory.amount)}). That's about ${share}% of your total expenses.`
+      description: `You spent the most on ${topCategory.category} (${formatCurrency(topCategory.amount, baseCurrency)}). That's about ${share}% of your total expenses.`
     });
   }
 
   if (summary.monthlyBudget > 0) {
     const used = Math.round((summary.totalExpense / summary.monthlyBudget) * 100);
     if (used >= 100) {
-      insights.push({ title: "⚠️ Budget Alert", description: `Oops! You have crossed your monthly budget by ${currency(Math.abs(summary.budgetRemaining))}. Try to cut back on non-essentials.` });
+      insights.push({ title: "⚠️ Budget Alert", description: `Oops! You have crossed your monthly budget by ${formatCurrency(Math.abs(summary.budgetRemaining), baseCurrency)}. Try to cut back on non-essentials.` });
     } else if (used >= 80) {
       insights.push({ title: "👀 Watch Your Spending", description: `You have used ${used}% of your budget for this month. It's time to slow down a bit!` });
     } else {
-      insights.push({ title: "✅ On Track", description: `Great job! You still have ${currency(summary.budgetRemaining)} left in your budget this month.` });
+      insights.push({ title: "✅ On Track", description: `Great job! You still have ${formatCurrency(summary.budgetRemaining, baseCurrency)} left in your budget this month.` });
     }
   }
 
   budget?.categoryBudgets?.forEach((item) => {
     const spent = summary.categoryBreakdown.find((entry) => entry.category === item.category)?.amount || 0;
     if (item.limit > 0 && spent > item.limit) {
-      insights.push({ title: "🚨 Category Over Limit", description: `You went over your budget for ${item.category} by ${currency(spent - item.limit)}.` });
+      insights.push({ title: "🚨 Category Over Limit", description: `You went over your budget for ${item.category} by ${formatCurrency(spent - item.limit, baseCurrency)}.` });
     }
   });
 
   if (summary.savings < 0) {
-    insights.push({ title: "📉 Spending More Than Earning", description: `Your expenses are higher than your income by ${currency(Math.abs(summary.savings))}.` });
+    insights.push({ title: "📉 Spending More Than Earning", description: `Your expenses are higher than your income by ${formatCurrency(Math.abs(summary.savings), baseCurrency)}.` });
     recommendations.push({ title: "💡 Quick Fix", description: "Try to reduce flexible spending (like dining out) until your cash flow is positive again." });
   } else {
-    recommendations.push({ title: "💰 Saving Up", description: `You are currently saving ${currency(summary.savings)}. Consider moving some of this into a dedicated savings account!` });
+    recommendations.push({ title: "💰 Saving Up", description: `You are currently saving ${formatCurrency(summary.savings, baseCurrency)}. Consider moving some of this into a dedicated savings account!` });
   }
 
   if (topCategory) {
-    recommendations.push({ title: "✂️ Easy Savings", description: `If you cut back just 10% on ${topCategory.category}, you could save around ${currency(topCategory.amount * 0.1)}!` });
+    recommendations.push({ title: "✂️ Easy Savings", description: `If you cut back just 10% on ${topCategory.category}, you could save around ${formatCurrency(topCategory.amount * 0.1, baseCurrency)}!` });
   }
 
   const monthlyExpenses = summary.monthlyTrend.map((item) => item.expense);

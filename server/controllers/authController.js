@@ -17,7 +17,8 @@ const generateToken = (id) => {
 const sanitizeUser = (user) => ({
   id: user._id,
   name: user.name,
-  email: user.email
+  email: user.email,
+  baseCurrency: user.baseCurrency || 'INR'
 });
 
 export const signup = async (req, res) => {
@@ -119,7 +120,7 @@ export const getMe = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, baseCurrency } = req.body;
     const normalizedEmail = email?.trim().toLowerCase();
 
     if (!name?.trim() || !normalizedEmail) {
@@ -137,9 +138,14 @@ export const updateProfile = async (req, res) => {
       });
     }
 
+    const updateData = { name: name.trim(), email: normalizedEmail, updatedAt: new Date() };
+    if (baseCurrency) {
+      updateData.baseCurrency = baseCurrency;
+    }
+
     const user = await User.findByIdAndUpdate(
       req.userId,
-      { name: name.trim(), email: normalizedEmail, updatedAt: new Date() },
+      updateData,
       { new: true, runValidators: true }
     );
 

@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchBudget, saveBudget } from '../redux/slices/budgetSlice'
+import { getCurrencySymbol } from '../utils/format'
 import toast from 'react-hot-toast'
 
 function Budget() {
   const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
+  const currencySymbol = getCurrencySymbol(user?.baseCurrency)
   const { monthlyBudget, categories, loading, error } = useSelector((state) => state.budget)
   
   const [localBudget, setLocalBudget] = useState(0)
@@ -65,7 +68,7 @@ function Budget() {
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-2">Total Monthly Budget</label>
             <div className="relative">
-              <span className="absolute left-4 top-2.5 text-gray-500 font-medium">₹</span>
+              <span className="absolute left-4 top-2.5 text-gray-500 font-medium">{currencySymbol}</span>
               <input
                 type="number"
                 min="0"
@@ -109,7 +112,7 @@ function Budget() {
                   <div className="flex-1 w-full sm:w-auto">
                     <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase">Limit</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2 text-gray-400">₹</span>
+                      <span className="absolute left-3 top-2 text-gray-400">{currencySymbol}</span>
                       <input 
                         type="number" min="0"
                         value={cat.limit}

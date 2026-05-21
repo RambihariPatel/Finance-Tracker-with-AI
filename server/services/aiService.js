@@ -6,8 +6,8 @@ const hasOpenAIKey = () => {
   return key && key !== 'your_openai_api_key_here';
 };
 
-export const generateAIInsights = async ({ transactions, budget }) => {
-  const analysis = analyzeFinance({ transactions, budget });
+export const generateAIInsights = async ({ transactions, budget, baseCurrency }) => {
+  const analysis = analyzeFinance({ transactions, budget, baseCurrency });
 
   if (!hasOpenAIKey()) {
     return {
@@ -56,8 +56,8 @@ export const generateAIInsights = async ({ transactions, budget }) => {
   }
 };
 
-export const predictExpense = async ({ transactions, budget }) => {
-  const analysis = analyzeFinance({ transactions, budget });
+export const predictExpense = async ({ transactions, budget, baseCurrency }) => {
+  const analysis = analyzeFinance({ transactions, budget, baseCurrency });
 
   return {
     predictedExpense: analysis.predictedExpense,

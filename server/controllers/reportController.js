@@ -2,8 +2,15 @@ import PDFDocument from 'pdfkit';
 import Transaction from '../models/Transaction.js';
 import Budget from '../models/Budget.js';
 import { summarizeTransactions } from '../services/financeAnalyzer.js';
+import User from '../models/User.js';
 
-const formatCurrency = (value) => `INR${Math.round(value || 0).toLocaleString('en-IN')}`;
+const formatCurrencyPdf = (value, currencyCode = 'INR') => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: currencyCode,
+    maximumFractionDigits: 0
+  }).format(value || 0);
+};
 
 export const getMonthlyReport = async (req, res) => {
   try {
@@ -18,6 +25,8 @@ export const getMonthlyReport = async (req, res) => {
       transactionDate: { $gte: start, $lt: end }
     }).sort({ transactionDate: -1 });
     const budget = await Budget.findOne({ userId: req.userId });
+    const user = await User.findById(req.userId);
+    const baseCurrency = user?.baseCurrency || 'INR';
     const summary = summarizeTransactions(transactions, budget);
 
     const report = {
@@ -40,17 +49,18 @@ export const getMonthlyReport = async (req, res) => {
       doc.fontSize(22).text('FinTrack Monthly Report');
       doc.moveDown(0.5).fontSize(12).text(`Period:${report.period}`);
       doc.moveDown();
-      doc.fontSize(14).text(`Income:${formatCurrency(report.totalIncome)}`);
-      doc.text(`Expense:${formatCurrency(report.totalExpense)}`);
-      doc.text(`Savings:${formatCurrency(report.savings)}`);
-      doc.text(`Budget Remaining:${formatCurrency(report.budgetRemaining)}`);
+      doc.fontSize(14).text(`Income:${formatCurrencyPdf(report.totalIncome, baseCurrency)}`);
+      doc.text(`Expense:${formatCurrencyPdf(report.totalExpense, baseCurrency)}`);
+      doc.text(`Savings:${formatCurrencyPdf(report.savings, baseCurrency)}`);
+      doc.text(`Budget Remaining:${formatCurrencyPdf(report.budgetRemaining, baseCurrency)}`);
       doc.moveDown().fontSize(16).text('Category Breakdown');
       report.categoryBreakdown.forEach((item) => {
-        doc.fontSize(11).text(`${item.category}:${formatCurrency(item.amount)}`);
+        doc.fontSize(11).text(`${item.category}:${formatCurrencyPdf(item.amount, baseCurrency)}`);
       });
       doc.moveDown().fontSize(16).text('Transactions');
       report.transactions.slice(0, 40).forEach((item) => {
-        doc.fontSize(10).text(`${new Date(item.transactionDate).toLocaleDateString('en-IN')} |${item.type} |${item.title} |${formatCurrency(item.amount)}`);
+        const amt = item.baseAmount || item.amount;
+        doc.fontSize(10).text(`${new Date(item.transactionDate).toLocaleDateString('en-IN')} |${item.type} |${item.title} |${formatCurrencyPdf(amt, baseCurrency)}`);
       });
       doc.end();
       return;

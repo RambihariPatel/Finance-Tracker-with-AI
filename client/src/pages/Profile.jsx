@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateProfileThunk } from '../redux/slices/authSlice'
 import { changePassword, getAccountStats } from '../services/authService'
-import { formatCurrency } from '../utils/format'
+import { formatCurrency, SUPPORTED_CURRENCIES } from '../utils/format'
 
 function Profile() {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
 
-  const [profile, setProfile] = useState({ name: '', email: '' })
+  const [profile, setProfile] = useState({ name: '', email: '', baseCurrency: 'INR' })
   const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '' })
   const [stats, setStats] = useState(null)
   const [message, setMessage] = useState('')
@@ -16,7 +16,7 @@ function Profile() {
 
   useEffect(() => {
     if (user) {
-      setProfile({ name: user.name || '', email: user.email || '' })
+      setProfile({ name: user.name || '', email: user.email || '', baseCurrency: user.baseCurrency || 'INR' })
     }
     const fetchStats = async () => {
       try {
@@ -101,6 +101,18 @@ function Profile() {
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"
                 />
               </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Base Currency</label>
+                <select
+                  value={profile.baseCurrency}
+                  onChange={(e) => setProfile({ ...profile, baseCurrency: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                >
+                  {SUPPORTED_CURRENCIES.map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
               <div className="md:col-span-2 flex justify-end pt-2">
                 <button type="submit" className="bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition">
                   Save Changes
@@ -153,15 +165,15 @@ function Profile() {
               </div>
               <div className="flex justify-between items-center border-t pt-4">
                 <span className="text-gray-600 font-medium">Total Income</span>
-                <span className="font-bold text-green-600">{formatCurrency(stats.totalIncome)}</span>
+                <span className="font-bold text-green-600">{formatCurrency(stats.totalIncome, user?.baseCurrency)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 font-medium">Total Expenses</span>
-                <span className="font-bold text-red-500">{formatCurrency(stats.totalExpense)}</span>
+                <span className="font-bold text-red-500">{formatCurrency(stats.totalExpense, user?.baseCurrency)}</span>
               </div>
               <div className="flex justify-between items-center border-t pt-4">
                 <span className="text-gray-600 font-medium">Net Savings</span>
-                <span className={`font-black text-lg ${stats.savings >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>{formatCurrency(stats.savings)}</span>
+                <span className={`font-black text-lg ${stats.savings >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>{formatCurrency(stats.savings, user?.baseCurrency)}</span>
               </div>
             </div>
           ) : (

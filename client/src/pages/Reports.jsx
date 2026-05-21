@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis
 import { getMonthlyReport, downloadMonthlyReport } from '../services/reportService'
 import { formatCurrency, formatDate } from '../utils/format'
 import * as XLSX from 'xlsx'
+import { useSelector } from 'react-redux'
 
 const COLORS = ['#2563eb', '#059669', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2', '#db2777', '#0d9488']
 
@@ -45,6 +46,7 @@ const getCategoryIcon = (category) => {
 }
 
 function Reports() {
+  const { user } = useSelector((state) => state.auth)
   const now = new Date()
   const [period, setPeriod] = useState({ month: now.getMonth() + 1, year: now.getFullYear() })
   const [report, setReport] = useState(null)
@@ -212,7 +214,7 @@ function Reports() {
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1">
                   <span>{icon}</span> {label}
                 </p>
-                <p className={`text-2xl font-black mt-2 ${color}`}>{formatCurrency(value)}</p>
+                <p className={`text-2xl font-black mt-2 ${color}`}>{formatCurrency(value, user?.baseCurrency)}</p>
               </div>
             ))}
           </div>
@@ -231,7 +233,7 @@ function Reports() {
                       <YAxis axisLine={false} tickLine={false} tick={{ fill: '#888', fontSize: 12 }} tickFormatter={(v) => `₹${v}`} />
                       <Tooltip
                         contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        formatter={(value, name) => [formatCurrency(value), 'Amount']}
+                        formatter={(value, name) => [formatCurrency(value, user?.baseCurrency), 'Amount']}
                         labelFormatter={(label) => `${getCategoryIcon(label)} ${label}`}
                       />
                       <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={55}>
@@ -268,7 +270,7 @@ function Reports() {
                         </div>
                       </div>
                       <span className={`text-sm font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
-                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.baseAmount || t.amount, user?.baseCurrency)}
                       </span>
                     </div>
                   ))
@@ -291,7 +293,7 @@ function Reports() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">{c.name}</p>
-                      <p className="text-sm font-bold text-gray-800 dark:text-slate-100">{formatCurrency(c.amount)}</p>
+                      <p className="text-sm font-bold text-gray-800 dark:text-slate-100">{formatCurrency(c.amount, user?.baseCurrency)}</p>
                     </div>
                   </div>
                 ))}

@@ -5,6 +5,7 @@ import { formatCurrency } from '../utils/format'
 
 function Insights() {
   const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
   const { insights, predictions, provider, loading, error } = useSelector((state) => state.insights)
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function Insights() {
       `--- Recommendations ---\n` +
       insights.map(i => `${i.title || 'Insight'}\n${i.description || i}`).join('\n\n') + 
       `\n\n--- Spending Prediction ---\n` +
-      `Estimated Expense Next Month: ${formatCurrency(predictions.predictedExpense || 0)}\n` +
+      `Estimated Expense Next Month: ${formatCurrency(predictions.predictedExpense || 0, user?.baseCurrency)}\n` +
       `Model Confidence: ${predictions.confidence || 0}%\n`;
       
     const blob = new Blob([text], { type: 'text/plain' });
@@ -119,7 +120,7 @@ function Insights() {
               <div>
                 <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Estimated Expense Next Month</p>
                 <p className="text-4xl font-black text-gray-800">
-                  {formatCurrency(predictions.predictedExpense)}
+                  {formatCurrency(predictions.predictedExpense, user?.baseCurrency)}
                 </p>
               </div>
               
