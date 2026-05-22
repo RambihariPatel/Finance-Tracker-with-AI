@@ -15,11 +15,14 @@ import {
 } from 'recharts'
 import { getDashboardSummary } from '../services/dashboardService'
 import { formatCurrency, formatDate } from '../utils/format'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { paySubscription } from '../redux/slices/subscriptionSlice'
+import toast from 'react-hot-toast'
 
 const COLORS = ['#2563eb', '#059669', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2']
 
 function Dashboard() {
+  const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -38,6 +41,18 @@ function Dashboard() {
     }
     fetchSummary()
   }, [])
+
+  const handlePaySubscription = async (id) => {
+    try {
+      await dispatch(paySubscription(id)).unwrap()
+      toast.success('Subscription Paid Successfully!')
+      // Refresh dashboard data
+      const response = await getDashboardSummary()
+      setSummary(response.data.data)
+    } catch (err) {
+      toast.error(err || 'Failed to pay subscription')
+    }
+  }
 
   if (loading) return <div className="text-center py-20 text-xl font-medium text-gray-500">Loading dashboard...</div>
   if (error) return <div className="p-4 bg-red-50 text-red-600 rounded-lg max-w-4xl mx-auto mt-6">{error}</div>
@@ -82,6 +97,46 @@ function Dashboard() {
           <p className="text-3xl font-bold text-indigo-900 dark:text-indigo-200 mt-2">{formatCurrency(summary.savings, user?.baseCurrency)}</p>
         </div>
       </div>
+
+      {/* Upcoming Bills Reminder */}
+      {summary.upcomingBills && summary.upcomingBills.length > 0 && (
+        <section className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-2xl">⚠️</span>
+            <h2 className="text-lg font-bold text-amber-900">Upcoming Bills Reminder</h2>
+          </div>
+          <div className="space-y-3">
+            {summary.upcomingBills.map(bill => {
+              const dueDate = new Date(bill.nextDueDate);
+              const tomorrow = new Date();
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              const dueTomorrow = dueDate.getDate() === tomorrow.getDate() && dueDate.getMonth() === tomorrow.getMonth();
+              
+              return (
+                <div key={bill._id} className="bg-white/60 rounded-xl p-3 flex justify-between items-center border border-amber-100">
+                  <div>
+                    <p className="font-bold text-amber-900">{bill.title} {dueTomorrow && <span className="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full ml-2">Due Tomorrow!</span>}</p>
+                    <p className="text-xs text-amber-700">Due on: {formatDate(bill.nextDueDate)}</p>
+                  </div>
+                  <div className="text-right flex flex-col items-end gap-2">
+                    <p className="font-bold text-gray-900">{formatCurrency(bill.baseAmount, user?.baseCurrency)}</p>
+                    <button 
+                      onClick={() => handlePaySubscription(bill._id)}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg shadow-sm transition"
+                    >
+                      Pay Now
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-4 pt-4 border-t border-amber-200/50 flex justify-between items-center">
+            <span className="text-sm font-semibold text-amber-800">Projected Savings After Deductions:</span>
+            <span className="text-lg font-black text-amber-900">{formatCurrency(summary.projectedBalance, user?.baseCurrency)}</span>
+          </div>
+        </section>
+      )}
 
       {/* Monthly Budget Progress Bar */}
       {summary.monthlyBudget > 0 && (() => {

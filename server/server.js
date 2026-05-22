@@ -1,5 +1,6 @@
 import app, { connectDB } from './app.js';
 import dotenv from 'dotenv';
+import { initCronJobs } from './services/cronService.js';
 
 dotenv.config();
 
@@ -18,3 +19,4 @@ const startServer = async () => {
 };
 
 startServer();
+initCronJobs();

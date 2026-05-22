@@ -4,6 +4,7 @@ import transactionReducer from './slices/transactionSlice'
 import budgetReducer from './slices/budgetSlice'
 import insightReducer from './slices/insightSlice'
 import goalReducer from './slices/goalSlice'
+import subscriptionReducer from './slices/subscriptionSlice'
 
 // configure the redux store with the following reducers:
 //   auth         → authReducer
@@ -16,7 +17,8 @@ const store = configureStore({
     transactions: transactionReducer,
     budget: budgetReducer,
     insights: insightReducer,
-    goals: goalReducer
+    goals: goalReducer,
+    subscriptions: subscriptionReducer
   }
 })
 
