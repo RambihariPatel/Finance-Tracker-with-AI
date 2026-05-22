@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import Transaction from '../models/Transaction.js';
 import Budget from '../models/Budget.js';
 import { summarizeTransactions } from '../services/financeAnalyzer.js';
+import { convertAmount } from '../services/currencyService.js';
 
 const generateToken = (id) => {
   if (!process.env.JWT_SECRET) {
@@ -138,9 +139,13 @@ export const updateProfile = async (req, res) => {
       });
     }
 
+    const currentUser = await User.findById(req.userId);
+    let baseCurrencyChanged = false;
     const updateData = { name: name.trim(), email: normalizedEmail, updatedAt: new Date() };
-    if (baseCurrency) {
+    
+    if (baseCurrency && baseCurrency !== (currentUser.baseCurrency || 'INR')) {
       updateData.baseCurrency = baseCurrency;
+      baseCurrencyChanged = true;
     }
 
     const user = await User.findByIdAndUpdate(
@@ -148,6 +153,14 @@ export const updateProfile = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     );
+
+    if (baseCurrencyChanged) {
+      const transactions = await Transaction.find({ userId: req.userId });
+      for (const t of transactions) {
+        const newBaseAmount = await convertAmount(t.amount, t.currency || 'INR', baseCurrency);
+        await Transaction.updateOne({ _id: t._id }, { $set: { baseAmount: newBaseAmount } });
+      }
+    }
 
     res.status(200).json({
       success: true,
