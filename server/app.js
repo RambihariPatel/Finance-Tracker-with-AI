@@ -13,6 +13,7 @@ import budgetRoutes from './routes/budgetRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import goalRoutes from './routes/goalRoutes.js';
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/budget', budgetRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/goals', goalRoutes);
 
 // Database Connection
 export const connectDB = async () => {
