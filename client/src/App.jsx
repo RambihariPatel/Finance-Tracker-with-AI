@@ -14,6 +14,7 @@ import Reports from './pages/Reports'
 import Profile from './pages/Profile'
 import Goals from './pages/Goals'
 import Subscriptions from './pages/Subscriptions'
+import NotFound from './pages/NotFound'
 
 // Layout
 import Layout from './components/layout/Layout'
@@ -58,7 +59,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   )
