@@ -14,6 +14,8 @@ import Reports from './pages/Reports'
 import Profile from './pages/Profile'
 import Goals from './pages/Goals'
 import Subscriptions from './pages/Subscriptions'
+import Groups from './pages/Groups'
+import GroupDetail from './pages/GroupDetail'
 import NotFound from './pages/NotFound'
 
 // Layout
@@ -54,6 +56,8 @@ function App() {
             <Route path="/insights" element={<Insights />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/groups/:id" element={<GroupDetail />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/profile" element={<Profile />} />
           </Route>

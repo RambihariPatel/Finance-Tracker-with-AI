@@ -9,6 +9,7 @@ const PAGE_NAMES = {
   '/transactions': 'Transactions',
   '/budget': 'Budget',
   '/insights': 'AI Insights',
+  '/groups': 'Group Splitter',
   '/reports': 'Reports',
   '/profile': 'Profile'
 }

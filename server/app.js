@@ -15,6 +15,7 @@ import reportRoutes from './routes/reportRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import goalRoutes from './routes/goalRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import groupRoutes from './routes/groupRoutes.js';
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/groups', groupRoutes);
 
 // Database Connection
 export const connectDB = async () => {
