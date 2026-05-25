@@ -2,7 +2,7 @@
   "name": "ai-finance-tracker-server",
   "version": "1.0.0",
   "description": "AI Personal Finance Tracker Backend",
-  "main": "server.js",
+  "main": "server/server.js",
   "type": "module",
   "scripts": {
     "start": "node server/server.js",
