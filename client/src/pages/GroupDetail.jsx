@@ -284,14 +284,14 @@ function GroupDetail() {
               </p>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2.5 sm:gap-3">
             {group.creator?._id === user?.id && (
               <button
                 onClick={handleDeleteGroup}
-                className="px-5 py-2.5 rounded-xl font-bold border border-red-500/20 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/40 text-red-650 dark:text-red-400 transition shadow-sm flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl font-bold border border-red-500/20 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/40 text-red-650 dark:text-red-400 transition shadow-sm flex items-center gap-1.5 text-sm sm:text-base"
                 title="Delete this group permanently"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Delete Group
@@ -299,15 +299,15 @@ function GroupDetail() {
             )}
             <button
               onClick={() => setShowSettleModal(true)}
-              className="px-5 py-2.5 rounded-xl font-bold border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-455 transition shadow-sm"
+              className="px-5 py-2.5 rounded-xl font-bold border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-455 transition shadow-sm text-sm sm:text-base"
             >
               💸 Settle Up
             </button>
             <button
               onClick={() => setShowExpenseModal(true)}
-              className="px-5 py-2.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md hover:shadow-indigo-500/20 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md hover:shadow-indigo-500/20 hover:-translate-y-0.5 transition-all flex items-center gap-2 text-sm sm:text-base"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
               Add Expense
@@ -352,20 +352,20 @@ function GroupDetail() {
                         isSettlement ? 'bg-emerald-50/10 dark:bg-emerald-950/5 border-l-2 border-emerald-500 px-3 rounded-r-lg my-1' : ''
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg ${
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0 ${
                           isSettlement 
                             ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' 
                             : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
                         }`}>
                           {isSettlement ? '🤝' : '🛍️'}
                         </div>
-                        <div>
-                          <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight truncate sm:whitespace-normal sm:overflow-visible">
                             {expense.description}
                           </p>
-                          <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400 dark:text-slate-500 font-medium">
-                            <span>Paid by: {isUserPaid ? 'You' : expense.paidBy.name}</span>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs text-slate-400 dark:text-slate-550 font-medium">
+                            <span className="truncate max-w-[120px] sm:max-w-none">Paid by: {isUserPaid ? 'You' : expense.paidBy.name}</span>
                             <span>•</span>
                             <span>{formatDate(expense.date)}</span>
                             {!isSettlement && (
@@ -380,7 +380,7 @@ function GroupDetail() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-shrink-0">
                         <div className="text-right">
                           <p className={`font-black text-lg ${
                             isSettlement ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-100'
@@ -398,7 +398,7 @@ function GroupDetail() {
                         {(group.creator._id === user?.id || expense.paidBy._id === user?.id) && (
                           <button
                             onClick={() => handleDeleteExpense(expense._id)}
-                            className="text-slate-350 hover:text-red-500 dark:hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                            className="text-slate-350 hover:text-red-500 dark:hover:text-red-400 p-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 transition-opacity"
                             title="Delete Transaction"
                           >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
