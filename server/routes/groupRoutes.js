@@ -6,6 +6,7 @@ import {
   getGroupDetails,
   addExpense,
   deleteExpense,
+  deleteGroup,
   searchUsers
 } from '../controllers/groupController.js';
 
@@ -18,7 +19,11 @@ router
   .get(protect, getGroups)
   .post(protect, createGroup);
 
-router.route('/:id').get(protect, getGroupDetails);
+router
+  .route('/:id')
+  .get(protect, getGroupDetails)
+  .delete(protect, deleteGroup);
+
 router.route('/:id/expenses').post(protect, addExpense);
 router.route('/:id/expenses/:expenseId').delete(protect, deleteExpense);
 

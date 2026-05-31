@@ -399,3 +399,42 @@ export const deleteExpense = async (req, res) => {
     });
   }
 };
+
+// @desc    Delete a group
+// @route   DELETE /api/groups/:id
+// @access  Private
+export const deleteGroup = async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Group not found'
+      });
+    }
+
+    // Only allow deletion if the logged in user is the creator of the group
+    if (group.creator.toString() !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the creator of this group can delete it'
+      });
+    }
+
+    // Delete all expenses associated with the group
+    await GroupExpense.deleteMany({ groupId: req.params.id });
+
+    // Delete the group itself
+    await group.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: 'Group and all associated expenses deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import API from '../services/api';
@@ -10,6 +10,7 @@ const CATEGORIES = ['Food', 'Rent', 'Transport', 'Shopping', 'Entertainment', 'B
 function GroupDetail() {
   const { id } = useParams();
   const { user } = useSelector(state => state.auth);
+  const navigate = useNavigate();
 
   const [group, setGroup] = useState(null);
   const [expenses, setExpenses] = useState([]);
@@ -213,6 +214,20 @@ function GroupDetail() {
     }
   };
 
+  const handleDeleteGroup = async () => {
+    if (window.confirm('WARNING: Are you sure you want to permanently delete this group and all its expenses? This action cannot be undone.')) {
+      try {
+        const res = await API.delete(`/groups/${id}`);
+        if (res.data && res.data.success) {
+          toast.success('Group deleted successfully');
+          navigate('/groups');
+        }
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete group');
+      }
+    }
+  };
+
   const triggerSettleUpFromDebt = (debt) => {
     setSettleForm({
       fromUserId: debt.from._id,
@@ -270,6 +285,18 @@ function GroupDetail() {
             )}
           </div>
           <div className="flex gap-3">
+            {group.creator?._id === user?.id && (
+              <button
+                onClick={handleDeleteGroup}
+                className="px-5 py-2.5 rounded-xl font-bold border border-red-500/20 bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/40 text-red-650 dark:text-red-400 transition shadow-sm flex items-center gap-1.5"
+                title="Delete this group permanently"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Group
+              </button>
+            )}
             <button
               onClick={() => setShowSettleModal(true)}
               className="px-5 py-2.5 rounded-xl font-bold border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-455 transition shadow-sm"
