@@ -1,16 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const API_URL = '/api/goals';
+import * as goalService from '../../services/goalService';
 
 // Fetch all goals
 export const fetchGoals = createAsyncThunk(
   'goals/fetchGoals',
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(API_URL, config);
+      const response = await goalService.getGoals();
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -25,9 +21,7 @@ export const createGoal = createAsyncThunk(
   'goals/createGoal',
   async (goalData, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.post(API_URL, goalData, config);
+      const response = await goalService.createGoal(goalData);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -42,9 +36,7 @@ export const updateGoal = createAsyncThunk(
   'goals/updateGoal',
   async ({ id, goalData }, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.put(`${API_URL}/${id}`, goalData, config);
+      const response = await goalService.updateGoal(id, goalData);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -59,9 +51,7 @@ export const addFundsToGoal = createAsyncThunk(
   'goals/addFundsToGoal',
   async ({ id, amount }, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.post(`${API_URL}/${id}/add-funds`, { amount }, config);
+      const response = await goalService.addFundsToGoal(id, amount);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -76,9 +66,7 @@ export const deleteGoal = createAsyncThunk(
   'goals/deleteGoal',
   async (id, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`${API_URL}/${id}`, config);
+      await goalService.deleteGoal(id);
       return id;
     } catch (error) {
       return thunkAPI.rejectWithValue(

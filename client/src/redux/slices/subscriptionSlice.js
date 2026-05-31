@@ -1,15 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const API_URL = '/api/subscriptions';
+import * as subscriptionService from '../../services/subscriptionService';
 
 export const fetchSubscriptions = createAsyncThunk(
   'subscriptions/fetchSubscriptions',
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(API_URL, config);
+      const response = await subscriptionService.getSubscriptions();
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch subscriptions');
@@ -21,9 +17,7 @@ export const createSubscription = createAsyncThunk(
   'subscriptions/createSubscription',
   async (subData, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.post(API_URL, subData, config);
+      const response = await subscriptionService.createSubscription(subData);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to create subscription');
@@ -35,9 +29,7 @@ export const updateSubscription = createAsyncThunk(
   'subscriptions/updateSubscription',
   async ({ id, subData }, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.put(`${API_URL}/${id}`, subData, config);
+      const response = await subscriptionService.updateSubscription(id, subData);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to update subscription');
@@ -49,9 +41,7 @@ export const deleteSubscription = createAsyncThunk(
   'subscriptions/deleteSubscription',
   async (id, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`${API_URL}/${id}`, config);
+      await subscriptionService.deleteSubscription(id);
       return id;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to delete subscription');
@@ -63,9 +53,7 @@ export const paySubscription = createAsyncThunk(
   'subscriptions/paySubscription',
   async (id, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.token;
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.post(`${API_URL}/${id}/pay`, {}, config);
+      const response = await subscriptionService.paySubscription(id);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to pay subscription');
