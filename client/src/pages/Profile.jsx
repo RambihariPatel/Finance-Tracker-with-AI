@@ -69,11 +69,11 @@ function Profile() {
       <div className="grid gap-6 xl:grid-cols-3">
         <div className="xl:col-span-2 space-y-6">
           {/* Avatar & Info */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center text-3xl font-black shadow-lg">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-5">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center text-3xl font-black shadow-lg flex-shrink-0">
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
-            <div>
+            <div className="min-w-0 break-words">
               <h2 className="text-2xl font-bold text-gray-800">{user?.name}</h2>
               <p className="text-gray-500">{user?.email}</p>
             </div>

@@ -189,7 +189,7 @@ export const changePassword = async (req, res) => {
 
     const user = await User.findById(req.userId).select('+password');
     if (!user || !(await user.matchPassword(currentPassword))) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: 'Current password is incorrect'
       });
