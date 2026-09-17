@@ -19,7 +19,9 @@ import groupRoutes from './routes/groupRoutes.js';
 
 const app = express();
 
-// ───── Security Middlewares ─────
+// ───── Trust Render/proxy headers (required for express-rate-limit on Render/Heroku) ─────
+app.set('trust proxy', 1);
+
 app.use(helmet());
 
 // ───── CORS ─────
