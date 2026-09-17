@@ -12,6 +12,8 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
+    // Only init cron jobs AFTER DB is connected and server is listening
+    initCronJobs();
   } catch (error) {
     console.error('Failed to start server:', error.message);
     process.exit(1);
@@ -19,4 +21,3 @@ const startServer = async () => {
 };
 
 startServer();
-initCronJobs();
