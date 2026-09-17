@@ -31,12 +31,19 @@ function Login() {
       if (loginUser.fulfilled.match(resultAction)) {
         navigate('/dashboard')
       } else {
-        setLocalError(resultAction.payload || 'Login failed.')
+        const errMsg = resultAction.payload || 'Login failed.'
+        // Network error vs auth error
+        if (errMsg.toLowerCase().includes('network') || errMsg.toLowerCase().includes('timeout')) {
+          setLocalError('Server is starting up, please wait 30 seconds and try again.')
+        } else {
+          setLocalError(errMsg)
+        }
       }
     } catch (err) {
-      setLocalError('An unexpected error occurred.')
+      setLocalError('An unexpected error occurred. Please try again.')
     }
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center p-4">

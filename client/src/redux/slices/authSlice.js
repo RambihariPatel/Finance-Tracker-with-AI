@@ -2,7 +2,16 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import * as authService from '../../services/authService'
 
 // helper: extract a readable message from an axios/network error
-const getError = (error) => error.response?.data?.message || error.message || 'Something went wrong'
+const getError = (error) => {
+  // No response = network error (backend down, CORS, wrong URL)
+  if (!error.response) {
+    return error.message?.includes('timeout')
+      ? 'Request timed out. Server may be starting up, please wait and try again.'
+      : 'Network error. Please check your connection or try again later.'
+  }
+  return error.response?.data?.message || error.message || 'Something went wrong'
+}
+
 
 export const loginUser = createAsyncThunk('auth/login', async (data, { rejectWithValue }) => {
   try {
