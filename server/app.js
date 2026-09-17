@@ -22,30 +22,31 @@ const app = express();
 // ───── Security Middlewares ─────
 app.use(helmet());
 
-// ───── CORS — allow frontend origin (env var in prod, localhost in dev) ─────
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'http://localhost:3000',
-].filter(Boolean); // remove undefined/empty
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Render health checks)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+// ───── CORS ─────
+// In production: allow FRONTEND_URL env var + localhost for dev
+// Note: cors() with no args allows ALL origins — fine for a public API.
+// We restrict only if FRONTEND_URL is explicitly set.
+const corsOptions = process.env.FRONTEND_URL
+  ? {
+      origin: [
+        process.env.FRONTEND_URL,
+        // also allow the www variant
+        process.env.FRONTEND_URL.replace('https://', 'https://www.'),
+        'http://localhost:5173',
+        'http://localhost:3000',
+      ].filter(Boolean),
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
     }
-    return callback(new Error(`CORS: Origin ${origin} not allowed`));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+  : {}; // No FRONTEND_URL set → allow all origins (open CORS for dev/testing)
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // pre-flight for all routes
 
 // ───── Rate Limiting ─────
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: 'Too many requests from this IP, please try again after 15 minutes',
   standardHeaders: true,
@@ -55,19 +56,24 @@ app.use('/api', limiter);
 
 // ───── Basic Middlewares ─────
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true }));
 
 // ───── Data Sanitization ─────
 app.use(mongoSanitize());
 app.use(xss());
 
-// ───── Health Check — required for Render uptime monitoring ─────
+// ───── Health Check — Render uses this to monitor uptime ─────
 app.get('/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
-  // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
   if (dbState === 1) {
-    return res.status(200).json({ status: 'ok', db: 'connected' });
+    return res.status(200).json({ status: 'ok', db: 'connected', uptime: process.uptime() });
   }
   return res.status(503).json({ status: 'error', db: 'disconnected' });
+});
+
+// Root ping
+app.get('/', (req, res) => {
+  res.json({ message: 'Finance Tracker API is running 🚀', health: '/health' });
 });
 
 // ───── API Routes ─────
@@ -87,6 +93,7 @@ app.use((req, res) => {
 });
 
 // ───── Global Error Handler ─────
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.message);
   res.status(err.status || 500).json({
@@ -97,16 +104,15 @@ app.use((err, req, res, next) => {
 
 // ───── Database Connection ─────
 export const connectDB = async () => {
+  const uri = process.env.MONGODB_URI;
   try {
-    const conn = await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/ai-finance-tracker',
-      {
-        serverSelectionTimeoutMS: 10000, // Fail fast if DB unreachable
-      }
-    );
-    console.log(`MongoDB connected: ${conn.connection.host}`);
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 15000, // 15s to connect to Atlas
+      socketTimeoutMS: 45000,
+    });
+    console.log(`✅ MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
-    console.error('MongoDB connection error:', err.message);
+    console.error('❌ MongoDB connection error:', err.message);
     throw err;
   }
 };
